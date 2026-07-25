@@ -189,10 +189,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="role-hint text-center">
                 <strong>Demo Accounts (Plain Text Passwords):</strong><br>
-                <span class="superadmin">superadmin / superadmin123</span>
+                <span class="superadmin">superadmin / admin123</span>
                 <span class="admin">admin / admin123</span>
-                <span class="editor">editor / editor123</span>
-                <span class="enumerator">enumerator / enum123</span>
+                <span class="editor">editor / admin123</span>
+                <span class="enumerator">enumerator / admin123</span>
             </div>
             
             <div class="text-center version">

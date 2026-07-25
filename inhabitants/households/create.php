@@ -8,6 +8,18 @@ $errors = [];
 $success = false;
 $record_id = null;
 
+// Get existing household members for head of family dropdown
+$members = $pdo->query("SELECT id, last_name, first_name, middle_name FROM household_records ORDER BY last_name, first_name")->fetchAll();
+
+// Get household types from database or use defaults
+$household_types = ['Nuclear', 'Single Parent', 'Extended', 'Childless', 'Grandparent', 'Step Family'];
+
+// Get dwelling types
+$dwelling_types = ['Single Family House', 'Townhouse', 'Condominium', 'Duplex', 'Mobile Home', 'Multi Unit', 'Apartment'];
+
+// Get positions
+$positions = ['Father', 'Mother', 'Son', 'Daughter', 'Grandmother', 'Grandfather', 'Father in Law', 'Mother in Law', 'Brother in Law', 'Sister in Law'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
     $last_name = trim($_POST['last_name']);
@@ -24,12 +36,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $disability = trim($_POST['disability']);
     $pets = trim($_POST['pets']);
     
+    // NEW FIELDS
+    $household_type = trim($_POST['household_type']);
+    $dwelling_type = trim($_POST['dwelling_type']);
+    $household_name = trim($_POST['household_name']);
+    $position_in_household = trim($_POST['position_in_household']);
+    $tenure_status = trim($_POST['tenure_status']);
+    $monthly_income = !empty($_POST['monthly_income']) ? (float)$_POST['monthly_income'] : 0;
+    $head_of_family_id = !empty($_POST['head_of_family_id']) ? (int)$_POST['head_of_family_id'] : null;
+    
     // Validate
     if (empty($last_name)) $errors[] = "Last name is required";
     if (empty($first_name)) $errors[] = "First name is required";
     if (empty($date_of_birth)) $errors[] = "Date of birth is required";
     if (empty($sex)) $errors[] = "Sex is required";
     if (empty($civil_status)) $errors[] = "Civil status is required";
+    if (empty($household_type)) $errors[] = "Household type is required";
+    if (empty($position_in_household)) $errors[] = "Position is required";
     
     // Calculate age
     $age = null;
@@ -52,15 +75,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             last_name, first_name, middle_name, ext_name, 
             place_of_birth, date_of_birth, age, sex, 
             civil_status, citizenship, occupation, profession, 
-            disability, pets, profile_picture, created_by
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            disability, pets, profile_picture, created_by,
+            household_type, dwelling_type, household_name, 
+            position_in_household, tenure_status, monthly_income, 
+            head_of_family_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmt = $pdo->prepare($sql);
         $result = $stmt->execute([
             $last_name, $first_name, $middle_name, $ext_name,
             $place_of_birth, $date_of_birth, $age, $sex,
             $civil_status, $citizenship, $occupation, $profession,
-            $disability, $pets, $profile_picture, $_SESSION['user_id']
+            $disability, $pets, $profile_picture, $_SESSION['user_id'],
+            $household_type, $dwelling_type, $household_name,
+            $position_in_household, $tenure_status, $monthly_income,
+            $head_of_family_id
         ]);
         
         if ($result) {
@@ -68,9 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             logAudit($_SESSION['user_id'], 'CREATE', 'household_records', $record_id, 
                 "Added household: $first_name $last_name");
             $success = true;
-            
-            // Clear cache
             clearCache('dashboard_stats');
+            
+            // Refresh members list
+            $members = $pdo->query("SELECT id, last_name, first_name, middle_name FROM household_records ORDER BY last_name, first_name")->fetchAll();
         } else {
             $errors[] = "Failed to save record. Please try again.";
         }
@@ -82,10 +112,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Household - RBIS</title>
+    <title>Create Household - RBIS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../assets/css/custom.css">
+    <style>
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+        .form-section-title {
+            font-weight: 700;
+            color: #28a745;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        .form-section-title i {
+            margin-right: 8px;
+        }
+        .required-star {
+            color: #dc3545;
+        }
+        .help-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+        .badge-option {
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #e9ecef;
+            margin: 2px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        .badge-option.active {
+            background: #28a745;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <div class="container-fluid">
@@ -95,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <main class="col-md-10 ms-sm-auto px-md-4 main-content">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-home-plus text-success"></i> Add New Household
+                        <i class="fas fa-home-plus text-success"></i> CREATE HOUSEHOLD
                     </h1>
                     <a href="index.php" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to List
@@ -121,115 +191,276 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 <?php endif; ?>
 
-                <div class="card">
-                    <div class="card-body">
-                        <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
-                            <div class="row">
-                                <!-- Profile Picture -->
-                                <div class="col-md-12 mb-4 text-center">
-                                    <div class="mb-2">
-                                        <img id="profilePreview" src="../../assets/images/default-avatar.png" class="profile-preview" alt="Profile Preview">
-                                    </div>
-                                    <label class="btn btn-outline-primary">
-                                        <i class="fas fa-camera"></i> Upload Profile Picture
-                                        <input type="file" name="profile_picture" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                                    </label>
-                                    <small class="d-block text-muted mt-1">
-                                        <i class="fas fa-info-circle"></i> JPG, PNG, GIF (Max 2MB)
-                                    </small>
-                                </div>
-
-                                <!-- Name Fields -->
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="last_name" class="form-control" required>
-                                    <div class="invalid-feedback">Last name is required</div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="first_name" class="form-control" required>
-                                    <div class="invalid-feedback">First name is required</div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Middle Name</label>
-                                    <input type="text" name="middle_name" class="form-control">
-                                </div>
-                                <div class="col-md-1 mb-3">
-                                    <label class="form-label">EXT</label>
-                                    <input type="text" name="ext_name" class="form-control" placeholder="Jr.">
-                                </div>
-
-                                <!-- Personal Details -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Place of Birth</label>
-                                    <input type="text" name="place_of_birth" class="form-control" placeholder="City/Municipality, Province">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                                    <input type="date" name="date_of_birth" class="form-control" required onchange="calculateAge(this)">
-                                    <small class="text-muted" id="ageDisplay">Age: </small>
-                                </div>
-
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Sex <span class="text-danger">*</span></label>
-                                    <select name="sex" class="form-select" required>
-                                        <option value="">Select...</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                    <div class="invalid-feedback">Sex is required</div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Civil Status <span class="text-danger">*</span></label>
-                                    <select name="civil_status" class="form-select" required>
-                                        <option value="">Select...</option>
-                                        <option value="Single">Single</option>
-                                        <option value="Married">Married</option>
-                                        <option value="Widowed">Widowed</option>
-                                        <option value="Divorced">Divorced</option>
-                                        <option value="Separated">Separated</option>
-                                    </select>
-                                    <div class="invalid-feedback">Civil status is required</div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Citizenship</label>
-                                    <input type="text" name="citizenship" class="form-control" placeholder="e.g., Filipino">
-                                </div>
-
-                                <!-- Occupation & Profession -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Occupation</label>
-                                    <input type="text" name="occupation" class="form-control" placeholder="e.g., Teacher">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Profession (if any)</label>
-                                    <input type="text" name="profession" class="form-control" placeholder="e.g., Licensed Professional Teacher">
-                                </div>
-
-                                <!-- Disability & Pets -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Disability</label>
-                                    <textarea name="disability" class="form-control" rows="2" placeholder="List any disabilities..."></textarea>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Pets</label>
-                                    <textarea name="pets" class="form-control" rows="2" placeholder="List pets in household..."></textarea>
-                                </div>
-
-                                <!-- Buttons -->
-                                <div class="col-md-12 mt-3">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-save"></i> Save Household
-                                    </button>
-                                    <a href="index.php" class="btn btn-secondary">
-                                        <i class="fas fa-times"></i> Cancel
-                                    </a>
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <!-- ============================================ -->
+                    <!-- HOUSEHOLD TYPE SECTION -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-home"></i> HOUSEHOLD TYPE
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">
+                                    Select Household Type <span class="required-star">*</span>
+                                </label>
+                                <select name="household_type" class="form-select" required>
+                                    <option value="">Select household type...</option>
+                                    <?php foreach ($household_types as $type): ?>
+                                        <option value="<?= $type ?>"><?= $type ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="help-text mt-1">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Select the type of household you belong to from the options provided.
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- ============================================ -->
+                    <!-- DWELLING TYPE SECTION -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-building"></i> DWELLING TYPE
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">
+                                    Select Dwelling Type
+                                </label>
+                                <select name="dwelling_type" class="form-select">
+                                    <option value="">Select dwelling type...</option>
+                                    <?php foreach ($dwelling_types as $type): ?>
+                                        <option value="<?= $type ?>"><?= $type ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="help-text mt-1">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Select the type of dwelling your household resides in.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- POSITION & FAMILY SECTION -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-users"></i> POSITION & FAMILY
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Position in Household <span class="required-star">*</span>
+                                </label>
+                                <select name="position_in_household" class="form-select" required>
+                                    <option value="">Select position...</option>
+                                    <?php foreach ($positions as $pos): ?>
+                                        <option value="<?= $pos ?>"><?= $pos ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="help-text mt-1">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Select your position in the household.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Household Name
+                                </label>
+                                <input type="text" name="household_name" class="form-control" placeholder="e.g., Dela Cruz Family">
+                                <div class="help-text mt-1">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Enter the name of your household (e.g., "Dela Cruz Family").
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- TENURE & INCOME SECTION -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-money-bill-wave"></i> TENURE & INCOME
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Tenure Status
+                                </label>
+                                <select name="tenure_status" class="form-select">
+                                    <option value="">Select tenure status...</option>
+                                    <option value="Owner">Owner</option>
+                                    <option value="Renter">Renter</option>
+                                    <option value="Living with Parents">Living with Parents</option>
+                                    <option value="Living with Relatives">Living with Relatives</option>
+                                    <option value="Boarder">Boarder</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div class="help-text mt-1">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Indicate your tenure status.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Monthly Income
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₱</span>
+                                    <input type="number" name="monthly_income" class="form-control" placeholder="0.00" step="0.01" min="0">
+                                </div>
+                                <div class="help-text mt-1">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Specify the total monthly income of your household.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- HEAD OF FAMILY SECTION -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-user-tie"></i> HEAD OF THE FAMILY
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">
+                                    Select Head of the Family
+                                </label>
+                                <select name="head_of_family_id" class="form-select">
+                                    <option value="">Select member...</option>
+                                    <?php foreach ($members as $member): ?>
+                                        <option value="<?= $member['id'] ?>">
+                                            <?= $member['last_name'] ?>, <?= $member['first_name'] ?>
+                                            <?php if ($member['middle_name']): ?>
+                                                <?= $member['middle_name'][0] ?>.
+                                            <?php endif; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="help-text mt-1">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Identify the head of the family by selecting from existing members.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- PERSONAL INFORMATION SECTION -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-user"></i> PERSONAL INFORMATION
+                        </div>
+                        <!-- Profile Picture -->
+                        <div class="text-center mb-3">
+                            <div class="mb-2">
+                                <img id="profilePreview" src="../../assets/images/default-avatar.png" class="profile-preview" alt="Profile Preview">
+                            </div>
+                            <label class="btn btn-outline-primary">
+                                <i class="fas fa-camera"></i> Upload Profile Picture
+                                <input type="file" name="profile_picture" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                            </label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Last Name <span class="required-star">*</span></label>
+                                <input type="text" name="last_name" class="form-control" required>
+                                <div class="invalid-feedback">Last name is required</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">First Name <span class="required-star">*</span></label>
+                                <input type="text" name="first_name" class="form-control" required>
+                                <div class="invalid-feedback">First name is required</div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Middle Name</label>
+                                <input type="text" name="middle_name" class="form-control">
+                            </div>
+                            <div class="col-md-1 mb-3">
+                                <label class="form-label">EXT</label>
+                                <input type="text" name="ext_name" class="form-control" placeholder="Jr.">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Place of Birth</label>
+                                <input type="text" name="place_of_birth" class="form-control" placeholder="City/Municipality, Province">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date of Birth <span class="required-star">*</span></label>
+                                <input type="date" name="date_of_birth" class="form-control" required onchange="calculateAge(this)">
+                                <small class="text-muted" id="ageDisplay">Age: </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Sex <span class="required-star">*</span></label>
+                                <select name="sex" class="form-select" required>
+                                    <option value="">Select...</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Civil Status <span class="required-star">*</span></label>
+                                <select name="civil_status" class="form-select" required>
+                                    <option value="">Select...</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Widowed">Widowed</option>
+                                    <option value="Divorced">Divorced</option>
+                                    <option value="Separated">Separated</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Citizenship</label>
+                                <input type="text" name="citizenship" class="form-control" placeholder="e.g., Filipino">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Occupation</label>
+                                <input type="text" name="occupation" class="form-control" placeholder="e.g., Teacher">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Profession</label>
+                                <input type="text" name="profession" class="form-control" placeholder="e.g., Licensed Professional Teacher">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Disability</label>
+                                <textarea name="disability" class="form-control" rows="2" placeholder="List any disabilities..."></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Pets</label>
+                                <textarea name="pets" class="form-control" rows="2" placeholder="List pets in household..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="mt-3 text-end">
+                        <button type="submit" class="btn btn-success btn-lg px-5">
+                            <i class="fas fa-save"></i> SAVE
+                        </button>
+                    </div>
+                </form>
             </main>
         </div>
     </div>

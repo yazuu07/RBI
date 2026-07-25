@@ -1,14 +1,11 @@
 <?php
-// includes/sidebar.php - FIXED with absolute paths
+// includes/sidebar.php - COMPLETE VERSION with all navigation items
 $current_page = basename($_SERVER['PHP_SELF']);
 $current_path = $_SERVER['PHP_SELF'];
 $user_role = $_SESSION['role'] ?? 'enumerator';
 
-// Get the base path dynamically
-$base_path = '/dashboard/RBI'; // CHANGE THIS to match your folder structure
-// If you're not sure, use: $base_path = '/dashboard/RBI';
-// Or detect it automatically:
-// $base_path = dirname(dirname($_SERVER['SCRIPT_NAME']));
+// Set your base path - CHANGE THIS to match your folder structure
+$base_path = '/dashboard/RBI';  // Adjust this to your actual path
 ?>
 <style>
 .sidebar {
@@ -150,15 +147,9 @@ $base_path = '/dashboard/RBI'; // CHANGE THIS to match your folder structure
                     <i class="fas fa-chart-pie"></i> Dashboard
                 </a>
             </li>
+        
             
-            <!-- RBI -->
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="fas fa-flag"></i> RBI
-                </a>
-            </li>
-            
-            <!-- Inhabitants -->
+            <!-- INHABITANTS -->
             <li class="nav-item">
                 <a class="nav-link text-white" data-bs-toggle="collapse" href="#inhabitantsMenu" role="button" 
                    aria-expanded="<?= strpos($current_path, 'inhabitants') !== false ? 'true' : 'false' ?>">
@@ -181,7 +172,7 @@ $base_path = '/dashboard/RBI'; // CHANGE THIS to match your folder structure
                 </div>
             </li>
             
-            <!-- Demographic -->
+            <!-- DEMOGRAPHIC -->
             <li class="nav-item">
                 <a class="nav-link text-white" data-bs-toggle="collapse" href="#demographicMenu" role="button"
                    aria-expanded="<?= strpos($current_path, 'demographic') !== false ? 'true' : 'false' ?>">
@@ -204,7 +195,7 @@ $base_path = '/dashboard/RBI'; // CHANGE THIS to match your folder structure
                 </div>
             </li>
             
-            <!-- Certification -->
+            <!-- CERTIFICATION -->
             <?php if (hasPermission('certification', 'view')): ?>
                 <li class="nav-item">
                     <a class="nav-link <?= strpos($current_path, 'certification') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/certification/index.php">
@@ -213,7 +204,7 @@ $base_path = '/dashboard/RBI'; // CHANGE THIS to match your folder structure
                 </li>
             <?php endif; ?>
             
-            <!-- Extras -->
+            <!-- EXTRAS -->
             <?php if (hasPermission('extras', 'view')): ?>
                 <li class="nav-item">
                     <a class="nav-link <?= strpos($current_path, 'extras') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/extras/vehicles.php">
@@ -222,7 +213,7 @@ $base_path = '/dashboard/RBI'; // CHANGE THIS to match your folder structure
                 </li>
             <?php endif; ?>
             
-            <!-- Reports -->
+            <!-- REPORTS -->
             <?php if (hasPermission('reports', 'view')): ?>
                 <li class="nav-item">
                     <a class="nav-link text-white" data-bs-toggle="collapse" href="#reportsMenu" role="button"
@@ -262,7 +253,7 @@ $base_path = '/dashboard/RBI'; // CHANGE THIS to match your folder structure
                 </li>
             <?php endif; ?>
             
-            <!-- System -->
+            <!-- SYSTEM -->
             <?php if (hasPermission('system', 'view')): ?>
                 <li class="nav-item">
                     <a class="nav-link text-white" data-bs-toggle="collapse" href="#systemMenu" role="button"
@@ -272,33 +263,40 @@ $base_path = '/dashboard/RBI'; // CHANGE THIS to match your folder structure
                     </a>
                     <div class="collapse <?= strpos($current_path, 'system') !== false ? 'show' : '' ?>" id="systemMenu">
                         <ul class="nav flex-column ms-3">
+                            <!-- Users List -->
                             <li class="nav-item">
-                                <a class="nav-link <?= strpos($current_path, 'users') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/system/users.php">
+                                <a class="nav-link <?= strpos($current_path, 'users.php') !== false && strpos($current_path, 'groups') === false && strpos($current_path, 'settings') === false ? 'active' : '' ?>" href="<?= $base_path ?>/system/users.php">
                                     <i class="fas fa-users-cog"></i> Users List
                                 </a>
                             </li>
                             
+                            <!-- Users Group (SuperAdmin/Admin only) -->
                             <?php if (hasPermission('system', 'manage')): ?>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="<?= $base_path ?>/system/groups.php">
+                                    <a class="nav-link <?= strpos($current_path, 'groups.php') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/system/groups.php">
                                         <i class="fas fa-user-tag"></i> Users Group
                                     </a>
                                 </li>
+                                
+                                <!-- Settings (SuperAdmin/Admin only) -->
                                 <li class="nav-item">
-                                    <a class="nav-link" href="<?= $base_path ?>/system/settings.php">
+                                    <a class="nav-link <?= strpos($current_path, 'settings.php') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/system/settings.php">
                                         <i class="fas fa-sliders-h"></i> Settings
                                     </a>
                                 </li>
                             <?php endif; ?>
                             
+                            <!-- Database (SuperAdmin only) -->
                             <?php if (hasPermission('system', 'sql_execute')): ?>
                                 <li class="nav-item">
                                     <a class="nav-link <?= strpos($current_path, 'database') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/system/database/index.php">
                                         <i class="fas fa-database"></i> Database
                                     </a>
                                 </li>
+                                
+                                <!-- Audit Trails (SuperAdmin only) -->
                                 <li class="nav-item">
-                                    <a class="nav-link <?= strpos($current_path, 'audit') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/system/audit.php">
+                                    <a class="nav-link <?= strpos($current_path, 'audit.php') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/system/audit.php">
                                         <i class="fas fa-clipboard-list"></i> Audit Trails
                                     </a>
                                 </li>

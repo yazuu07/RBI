@@ -38,6 +38,20 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$id]);
 $audit_trails = $stmt->fetchAll();
+
+// Get head of family name if exists
+$head_name = 'N/A';
+if ($record['head_of_family_id']) {
+    $head_stmt = $pdo->prepare("SELECT last_name, first_name, middle_name FROM household_records WHERE id = ?");
+    $head_stmt->execute([$record['head_of_family_id']]);
+    $head = $head_stmt->fetch();
+    if ($head) {
+        $head_name = $head['last_name'] . ', ' . $head['first_name'];
+        if ($head['middle_name']) {
+            $head_name .= ' ' . $head['middle_name'][0] . '.';
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -84,6 +98,10 @@ $audit_trails = $stmt->fetchAll();
         }
         .badge-household {
             background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        .section-divider {
+            border-top: 2px dashed #e9ecef;
+            margin: 15px 0;
         }
     </style>
 </head>
@@ -159,6 +177,11 @@ $audit_trails = $stmt->fetchAll();
                                     <span class="badge badge-household">
                                         <i class="fas fa-home"></i> Household Member
                                     </span>
+                                    <?php if ($record['position_in_household']): ?>
+                                        <span class="badge bg-primary ms-1">
+                                            <i class="fas fa-user-tag"></i> <?= htmlspecialchars($record['position_in_household']) ?>
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                                 
                                 <div class="mt-3">
@@ -175,6 +198,7 @@ $audit_trails = $stmt->fetchAll();
 
                     <!-- Information Cards -->
                     <div class="col-md-8">
+                        <!-- Personal Information -->
                         <div class="card detail-card">
                             <div class="card-header bg-white">
                                 <h5 class="mb-0"><i class="fas fa-info-circle text-primary"></i> Personal Information</h5>
@@ -242,6 +266,54 @@ $audit_trails = $stmt->fetchAll();
                                     <div class="col-md-6">
                                         <div class="info-label">Pets</div>
                                         <div class="info-value"><?= htmlspecialchars($record['pets']) ?: 'None' ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Household Details -->
+                        <div class="card detail-card mt-3">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0"><i class="fas fa-home text-success"></i> Household Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="info-label">Household Type</div>
+                                        <div class="info-value">
+                                            <span class="badge bg-info"><?= htmlspecialchars($record['household_type']) ?: 'N/A' ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Dwelling Type</div>
+                                        <div class="info-value"><?= htmlspecialchars($record['dwelling_type']) ?: 'N/A' ?></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Household Name</div>
+                                        <div class="info-value"><?= htmlspecialchars($record['household_name']) ?: 'N/A' ?></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Position in Household</div>
+                                        <div class="info-value">
+                                            <span class="badge bg-primary"><?= htmlspecialchars($record['position_in_household']) ?: 'N/A' ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Tenure Status</div>
+                                        <div class="info-value"><?= htmlspecialchars($record['tenure_status']) ?: 'N/A' ?></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Monthly Income</div>
+                                        <div class="info-value">₱ <?= number_format($record['monthly_income'] ?? 0, 2) ?></div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="info-label">Head of the Family</div>
+                                        <div class="info-value">
+                                            <strong><?= $head_name ?></strong>
+                                            <?php if ($record['head_of_family_id']): ?>
+                                                <span class="badge bg-secondary ms-2">ID: #<?= $record['head_of_family_id'] ?></span>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

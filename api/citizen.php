@@ -1,4 +1,9 @@
 <?php
+// api/citizens.php - Add this at the very top for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Then your existing code...
 require_once '../config.php';
 requireLogin();
 
