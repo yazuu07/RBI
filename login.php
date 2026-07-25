@@ -1,4 +1,5 @@
 <?php
+// login.php - Plain text password version (FOR TESTING ONLY)
 require_once 'config.php';
 
 // If already logged in, redirect to dashboard
@@ -23,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$username]);
     $user = $stmt->fetch();
     
-    if ($user && password_verify($password, $user['password'])) {
+    // COMPARE PLAIN TEXT PASSWORD (NO HASHING)
+    if ($user && $password === $user['password']) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['full_name'] = $user['full_name'];
@@ -186,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
             
             <div class="role-hint text-center">
-                <strong>Demo Accounts:</strong><br>
+                <strong>Demo Accounts (Plain Text Passwords):</strong><br>
                 <span class="superadmin">superadmin / superadmin123</span>
                 <span class="admin">admin / admin123</span>
                 <span class="editor">editor / editor123</span>

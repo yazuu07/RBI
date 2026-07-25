@@ -11,7 +11,7 @@ define('DB_NAME', 'rbis_db');
 // Application Configuration
 define('APP_NAME', 'Registry of Barangay Inhabitants System');
 define('APP_VERSION', '1.0.0');
-define('APP_URL', 'http://localhost/rbis');
+define('APP_URL', 'http://localhost/dashboard/RBI');
 
 // File Upload Configuration
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
