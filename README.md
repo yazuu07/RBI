@@ -26,5 +26,5 @@ mv RBI C:\xampp\htdocs\dashboard
 #### 4. navigate in chrome url with the link below
 
 ```bash
-http://localhost/dashboard/RBI/dashboard.php
+http://localhost/dashboard/RBI/login.php
 ```
