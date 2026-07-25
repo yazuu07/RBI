@@ -1,7 +1,14 @@
 <?php
+// includes/sidebar.php - FIXED with absolute paths
 $current_page = basename($_SERVER['PHP_SELF']);
 $current_path = $_SERVER['PHP_SELF'];
 $user_role = $_SESSION['role'] ?? 'enumerator';
+
+// Get the base path dynamically
+$base_path = '/dashboard/RBI'; // CHANGE THIS to match your folder structure
+// If you're not sure, use: $base_path = '/dashboard/RBI';
+// Or detect it automatically:
+// $base_path = dirname(dirname($_SERVER['SCRIPT_NAME']));
 ?>
 <style>
 .sidebar {
@@ -139,14 +146,14 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
         <ul class="nav flex-column mt-3">
             <!-- Dashboard -->
             <li class="nav-item">
-                <a class="nav-link <?= $current_page == 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php">
+                <a class="nav-link <?= $current_page == 'dashboard.php' ? 'active' : '' ?>" href="<?= $base_path ?>/dashboard.php">
                     <i class="fas fa-chart-pie"></i> Dashboard
                 </a>
             </li>
             
             <!-- RBI -->
             <li class="nav-item">
-                <a class="nav-link <?= $current_page == 'rbi.php' ? 'active' : '' ?>" href="#">
+                <a class="nav-link" href="#">
                     <i class="fas fa-flag"></i> RBI
                 </a>
             </li>
@@ -161,12 +168,12 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                 <div class="collapse <?= strpos($current_path, 'inhabitants') !== false ? 'show' : '' ?>" id="inhabitantsMenu">
                     <ul class="nav flex-column ms-3">
                         <li class="nav-item">
-                            <a class="nav-link <?= strpos($current_path, 'citizens') !== false ? 'active' : '' ?>" href="inhabitants/citizens/index.php">
+                            <a class="nav-link <?= strpos($current_path, 'citizens') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/inhabitants/citizens/index.php">
                                 <i class="fas fa-user"></i> Barangay Citizens
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link <?= strpos($current_path, 'households') !== false ? 'active' : '' ?>" href="inhabitants/households/index.php">
+                            <a class="nav-link <?= strpos($current_path, 'households') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/inhabitants/households/index.php">
                                 <i class="fas fa-home"></i> Barangay Households
                             </a>
                         </li>
@@ -184,12 +191,12 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                 <div class="collapse <?= strpos($current_path, 'demographic') !== false ? 'show' : '' ?>" id="demographicMenu">
                     <ul class="nav flex-column ms-3">
                         <li class="nav-item">
-                            <a class="nav-link <?= strpos($current_path, 'populations') !== false ? 'active' : '' ?>" href="demographic/populations.php">
+                            <a class="nav-link <?= strpos($current_path, 'populations') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/demographic/populations.php">
                                 <i class="fas fa-users"></i> Populations Demographic
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link <?= strpos($current_path, 'households_demo') !== false ? 'active' : '' ?>" href="demographic/households.php">
+                            <a class="nav-link <?= strpos($current_path, 'households_demo') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/demographic/households.php">
                                 <i class="fas fa-home"></i> Households Demographic
                             </a>
                         </li>
@@ -200,7 +207,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
             <!-- Certification -->
             <?php if (hasPermission('certification', 'view')): ?>
                 <li class="nav-item">
-                    <a class="nav-link <?= strpos($current_path, 'certification') !== false ? 'active' : '' ?>" href="certification/index.php">
+                    <a class="nav-link <?= strpos($current_path, 'certification') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/certification/index.php">
                         <i class="fas fa-certificate"></i> Certification
                     </a>
                 </li>
@@ -209,7 +216,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
             <!-- Extras -->
             <?php if (hasPermission('extras', 'view')): ?>
                 <li class="nav-item">
-                    <a class="nav-link <?= strpos($current_path, 'extras') !== false ? 'active' : '' ?>" href="extras/index.php">
+                    <a class="nav-link <?= strpos($current_path, 'extras') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/extras/vehicles.php">
                         <i class="fas fa-car"></i> Extras
                     </a>
                 </li>
@@ -226,27 +233,27 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                     <div class="collapse <?= strpos($current_path, 'reports') !== false ? 'show' : '' ?>" id="reportsMenu">
                         <ul class="nav flex-column ms-3">
                             <li class="nav-item">
-                                <a class="nav-link" href="reports/household.php">
+                                <a class="nav-link" href="<?= $base_path ?>/reports/household.php">
                                     <i class="fas fa-home"></i> Household
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="reports/voters_list.php">
+                                <a class="nav-link" href="<?= $base_path ?>/reports/voters_list.php">
                                     <i class="fas fa-vote-yea"></i> Voters List
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="reports/population_by_age.php">
+                                <a class="nav-link" href="<?= $base_path ?>/reports/population_by_age.php">
                                     <i class="fas fa-calendar-alt"></i> Population By Age
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="reports/population_by_sector.php">
+                                <a class="nav-link" href="<?= $base_path ?>/reports/population_by_sector.php">
                                     <i class="fas fa-building"></i> Population By Sector
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="reports/population_by_street.php">
+                                <a class="nav-link" href="<?= $base_path ?>/reports/population_by_street.php">
                                     <i class="fas fa-road"></i> Population By Street
                                 </a>
                             </li>
@@ -266,32 +273,32 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                     <div class="collapse <?= strpos($current_path, 'system') !== false ? 'show' : '' ?>" id="systemMenu">
                         <ul class="nav flex-column ms-3">
                             <li class="nav-item">
-                                <a class="nav-link <?= strpos($current_path, 'users') !== false ? 'active' : '' ?>" href="system/users.php">
+                                <a class="nav-link <?= strpos($current_path, 'users') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/system/users.php">
                                     <i class="fas fa-users-cog"></i> Users List
                                 </a>
                             </li>
                             
                             <?php if (hasPermission('system', 'manage')): ?>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="system/groups.php">
+                                    <a class="nav-link" href="<?= $base_path ?>/system/groups.php">
                                         <i class="fas fa-user-tag"></i> Users Group
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="system/settings.php">
+                                    <a class="nav-link" href="<?= $base_path ?>/system/settings.php">
                                         <i class="fas fa-sliders-h"></i> Settings
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="system/database/index.php">
-                                        <i class="fas fa-database"></i> Database
                                     </a>
                                 </li>
                             <?php endif; ?>
                             
                             <?php if (hasPermission('system', 'sql_execute')): ?>
                                 <li class="nav-item">
-                                    <a class="nav-link <?= strpos($current_path, 'audit') !== false ? 'active' : '' ?>" href="system/audit.php">
+                                    <a class="nav-link <?= strpos($current_path, 'database') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/system/database/index.php">
+                                        <i class="fas fa-database"></i> Database
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link <?= strpos($current_path, 'audit') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/system/audit.php">
                                         <i class="fas fa-clipboard-list"></i> Audit Trails
                                     </a>
                                 </li>
@@ -316,7 +323,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                     </span>
                 </div>
                 <div class="mt-1">
-                    <a href="logout.php" class="text-white-50 text-decoration-none small">
+                    <a href="<?= $base_path ?>/logout.php" class="text-white-50 text-decoration-none small">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </div>
