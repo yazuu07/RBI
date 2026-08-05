@@ -76,7 +76,7 @@ $total_households = $pdo->query("SELECT COUNT(*) FROM household_records")->fetch
 
                 <div class="report-header">
                     <h1>Republic of the Philippines</h1>
-                    <h3>Barangay Santo Cristo, Quezon City</h3>
+                    <h3>Barangay Nayong Kanluran, Quezon City</h3>
                     <h4>POPULATION BY SECTOR</h4>
                     <p>Generated on: <?= date('F d, Y h:i A') ?></p>
                     <p>Total Households: <?= number_format($total_households) ?></p>

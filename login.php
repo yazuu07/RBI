@@ -59,7 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-sizing: border-box;
         }
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+             background: #9EBD13;
+             background: linear-gradient(90deg, rgba(158, 189, 19, 1) 0%, rgba(0, 133, 82, 1) 100%);      height: 100vh;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -88,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .login-header .icon {
             font-size: 50px;
-            color: #667eea;
+            color: #e84e06;
             margin-bottom: 10px;
         }
         .login-header h2 {
@@ -110,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
         .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f16d0f 0%, #c68331 100%);
             border: none;
             padding: 12px;
             border-radius: 10px;
@@ -124,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: white;
         }
         .role-hint {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
             border-top: 1px solid #eee;
             padding-top: 15px;
@@ -136,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 2px 10px;
             border-radius: 12px;
             background: #f0f0f0;
-            font-size: 11px;
+            font-size: 5px;
         }
         .role-hint .superadmin { background: #dc3545; color: white; }
         .role-hint .admin { background: #0d6efd; color: white; }
@@ -160,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-card">
             <div class="login-header">
                 <div class="barangay-seal">
-                    <i class="fas fa-landmark"></i>
+                    <img src="Logo.png" alt="Landmark Icon" width="100" height="100" style="border-radius: 50%;">
                 </div>
                 <h2>Registry of Barangay Inhabitants</h2>
                 <p>System Login</p>
@@ -188,11 +189,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
             
             <div class="role-hint text-center">
-                <strong>Demo Accounts (Plain Text Passwords):</strong><br>
-                <span class="superadmin">superadmin / admin123</span>
-                <span class="admin">admin / admin123</span>
-                <span class="editor">editor / admin123</span>
-                <span class="enumerator">enumerator / admin123</span>
+                <strong>
+                    Registry of Barangay Nayong Kanluran Inhabitants System 
+                    Powered by: Lavender Fields Research and Development
+                    Developed by: NICOR TECH</strong><br>
             </div>
             
             <div class="text-center version">

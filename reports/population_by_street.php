@@ -85,7 +85,7 @@ $total_individuals = $pdo->query("SELECT COUNT(*) FROM individual_records")->fet
 
                 <div class="report-header">
                     <h1>Republic of the Philippines</h1>
-                    <h3>Barangay Santo Cristo, Quezon City</h3>
+                    <h3>Barangay Nayong Kanluran, Quezon City</h3>
                     <h4>POPULATION BY STREET</h4>
                     <p>Generated on: <?= date('F d, Y h:i A') ?></p>
                     <p>Total Population: <?= number_format($total_individuals) ?></p>

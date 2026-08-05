@@ -135,7 +135,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
             padding: 8px 20px;
         }
         .welcome-banner {
-            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            background: linear-gradient(135deg, #ac3d01 0%, #c7783f 100%);
             color: white;
             border-radius: 15px;
             padding: 20px 25px;

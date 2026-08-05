@@ -73,7 +73,7 @@ $total_households = count($households);
                 <!-- Report Header -->
                 <div class="report-header">
                     <h1>Republic of the Philippines</h1>
-                    <h3>Barangay Santo Cristo, Quezon City</h3>
+                    <h3>Barangay Nayong Kanluran, Quezon City</h3>
                     <h4>HOUSEHOLD REPORT</h4>
                     <p>Generated on: <?= date('F d, Y h:i A') ?></p>
                     <p>Total Households: <?= number_format($total_households) ?></p>

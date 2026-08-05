@@ -61,7 +61,7 @@ $total_voters = count($voters);
 
                 <div class="report-header">
                     <h1>Republic of the Philippines</h1>
-                    <h3>Barangay Santo Cristo, Quezon City</h3>
+                    <h3>Barangay Nayong Kanluran, Quezon City</h3>
                     <h4>VOTERS LIST</h4>
                     <p>Generated on: <?= date('F d, Y h:i A') ?></p>
                     <p>Total Eligible Voters (18+): <?= number_format($total_voters) ?></p>

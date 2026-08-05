@@ -16,7 +16,7 @@ $base_path = '/dashboard/RBI';  // Adjust this to your actual path
     z-index: 100;
     padding: 0;
     width: 16.66666667%;
-    background: #1a1a2e;
+    background: #0d2214;
     overflow-y: auto;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
@@ -33,7 +33,7 @@ $base_path = '/dashboard/RBI';  // Adjust this to your actual path
 }
 .sidebar-brand .brand-icon {
     font-size: 2rem;
-    color: #667eea;
+    color: #e1e2e7; 
 }
 .sidebar-brand .brand-text {
     color: white;
@@ -57,7 +57,7 @@ $base_path = '/dashboard/RBI';  // Adjust this to your actual path
     color: white !important;
 }
 .sidebar .nav-link.active {
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #15844d 0%, #4ba27c 100%);
     color: white !important;
 }
 .sidebar .nav-link i {
@@ -107,6 +107,16 @@ $base_path = '/dashboard/RBI';  // Adjust this to your actual path
     background: #667eea;
     border-radius: 10px;
 }
+.sidebar .brand-icon {
+  text-align: center;
+  padding: 20px;
+}
+
+.sidebar .brand-icon img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
 .main-content {
     margin-left: 16.66666667%;
     padding: 0;
@@ -133,7 +143,7 @@ $base_path = '/dashboard/RBI';  // Adjust this to your actual path
         <!-- Brand -->
         <div class="sidebar-brand">
             <div class="brand-icon">
-                <i class="fas fa-landmark"></i>
+                 <img src="Logo.png" alt="Landmark Icon">
             </div>
             <div class="brand-text">RBIS</div>
             <div class="brand-sub">Barangay Registry</div>
