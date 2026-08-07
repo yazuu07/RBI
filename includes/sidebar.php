@@ -214,15 +214,16 @@ $base_path = '/dashboard/RBI';  // Adjust this to your actual path
                 </li>
             <?php endif; ?>
             
-            <!-- EXTRAS -->
+            <!-- Extras -->
             <?php if (hasPermission('extras', 'view')): ?>
                 <li class="nav-item">
-                    <a class="nav-link <?= strpos($current_path, 'extras') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/extras/vehicles.php">
-                        <i class="fas fa-car"></i> Extras
+                    <a class="nav-link <?= strpos($current_path, 'extras') !== false ? 'active' : '' ?>" href="<?= $base_path ?>/extras/pets.php">
+                        <i class="fas fa-paw"></i>
+                        <span class="nav-text">Pets</span>
                     </a>
                 </li>
             <?php endif; ?>
-            
+                        
             <!-- REPORTS -->
             <?php if (hasPermission('reports', 'view')): ?>
                 <li class="nav-item">

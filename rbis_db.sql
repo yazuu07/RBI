@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 25, 2026 at 02:01 PM
+-- Generation Time: Aug 07, 2026 at 12:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -70,7 +70,30 @@ INSERT INTO `audit_trails` (`id`, `user_id`, `action`, `table_name`, `record_id`
 (14, 1, 'DELETE', 'household_records', 1, 'Deleted household: Nimrod Palomar', '::1', '2026-07-25 11:33:08'),
 (15, 1, 'CREATE', 'household_records', 3, 'Added household: Nimrod Palomar', '::1', '2026-07-25 11:34:16'),
 (16, 1, 'VIEW', 'household_records', 3, 'Viewed household: Nimrod Palomar', '::1', '2026-07-25 11:37:29'),
-(17, 1, 'LOGOUT', 'users', 1, 'User logged out', '::1', '2026-07-25 12:00:06');
+(17, 1, 'LOGOUT', 'users', 1, 'User logged out', '::1', '2026-07-25 12:00:06'),
+(18, 2, 'LOGIN', 'users', 2, 'User logged in', '::1', '2026-07-25 12:03:55'),
+(19, 2, 'LOGOUT', 'users', 2, 'User logged out', '::1', '2026-07-25 12:03:58'),
+(20, 4, 'LOGIN', 'users', 4, 'User logged in', '::1', '2026-07-25 12:04:03'),
+(21, 4, 'LOGOUT', 'users', 4, 'User logged out', '::1', '2026-07-25 12:04:08'),
+(22, 3, 'LOGIN', 'users', 3, 'User logged in', '::1', '2026-07-25 12:04:17'),
+(23, 3, 'LOGOUT', 'users', 3, 'User logged out', '::1', '2026-07-25 12:04:19'),
+(24, 1, 'LOGIN', 'users', 1, 'User logged in', '::1', '2026-07-25 12:04:24'),
+(25, 1, 'LOGIN', 'users', 1, 'User logged in', '::1', '2026-08-04 07:32:43'),
+(26, 1, 'LOGIN', 'users', 1, 'User logged in', '::1', '2026-08-06 09:33:31'),
+(27, 1, 'LOGIN', 'users', 1, 'User logged in', '::1', '2026-08-07 09:56:49'),
+(28, 1, 'VIEW', 'individual_records', 4, 'Viewed citizen: AEN DEE', '::1', '2026-08-07 10:33:38'),
+(29, 1, 'CREATE', 'individual_records', 5, 'Added citizen: Miles Morales', '::1', '2026-08-07 10:36:31'),
+(30, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:36:33'),
+(31, 1, 'DELETE', 'individual_records', 4, 'Deleted citizen: AEN DEE', '::1', '2026-08-07 10:37:26'),
+(32, 1, 'DELETE', 'individual_records', 3, 'Deleted citizen: Christian Cuescano', '::1', '2026-08-07 10:37:29'),
+(33, 1, 'DELETE', 'individual_records', 2, 'Deleted citizen: Ralvin Valiente', '::1', '2026-08-07 10:37:31'),
+(34, 1, 'DELETE', 'individual_records', 1, 'Deleted citizen: Nimrod Palomar', '::1', '2026-08-07 10:37:33'),
+(35, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:38:52'),
+(36, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:39:20'),
+(37, 1, 'VIEW', 'household_records', 3, 'Viewed household: Nimrod Palomar', '::1', '2026-08-07 10:39:53'),
+(38, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:40:06'),
+(39, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:41:47'),
+(40, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:42:09');
 
 -- --------------------------------------------------------
 
@@ -204,18 +227,66 @@ CREATE TABLE `individual_records` (
   `profile_picture` varchar(255) DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `educational_status` varchar(50) DEFAULT NULL,
+  `philsys_number` varchar(50) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `mobile_number` varchar(20) DEFAULT NULL,
+  `telephone_number` varchar(20) DEFAULT NULL,
+  `region` varchar(100) DEFAULT NULL,
+  `province` varchar(100) DEFAULT NULL,
+  `city_municipality` varchar(100) DEFAULT NULL,
+  `barangay_address` varchar(100) DEFAULT NULL,
+  `house_address` varchar(100) DEFAULT NULL,
+  `street` varchar(100) DEFAULT NULL,
+  `subdivision` varchar(100) DEFAULT NULL,
+  `zip_code` varchar(10) DEFAULT NULL,
+  `blood_type` varchar(10) DEFAULT NULL,
+  `weight` decimal(5,2) DEFAULT NULL,
+  `height` varchar(50) DEFAULT NULL,
+  `citizenship` varchar(50) DEFAULT NULL,
+  `registered_voter` tinyint(1) DEFAULT 0,
+  `voter_not_resident` tinyint(1) DEFAULT 0,
+  `ethnicity` varchar(50) DEFAULT NULL,
+  `position_in_household` varchar(50) DEFAULT NULL,
+  `mother_maiden_name` varchar(100) DEFAULT NULL,
+  `has_pet` tinyint(1) DEFAULT 0,
+  `sectors` text DEFAULT NULL,
+  `sector_other` varchar(100) DEFAULT NULL,
+  `profession` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `individual_records`
 --
 
-INSERT INTO `individual_records` (`id`, `last_name`, `first_name`, `middle_name`, `ext_name`, `place_of_birth`, `date_of_birth`, `age`, `sex`, `civil_status`, `highest_education`, `profile_picture`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'Palomar', 'Nimrod', 'Third', '', 'Caloocan', '2008-12-12', 17, 'Male', 'Single', 'Vocational', NULL, 1, '2026-07-25 10:58:17', '2026-07-25 10:58:17'),
-(2, 'Valiente', 'Ralvin', '', 'Jr.', 'Caloocan', '2006-12-12', 19, 'Male', 'Single', 'Vocational', NULL, 1, '2026-07-25 11:02:06', '2026-07-25 11:02:06'),
-(3, 'Cuescano', 'Christian', '', '', 'Caloocan', '2004-12-24', 21, 'Male', 'Single', 'Vocational', NULL, 1, '2026-07-25 11:11:53', '2026-07-25 11:11:53'),
-(4, 'DEE', 'AEN', '', '', 'San Fransico', '2006-03-23', 20, 'Female', 'Married', 'Post Graduate', NULL, 1, '2026-07-25 11:26:45', '2026-07-25 11:26:45');
+INSERT INTO `individual_records` (`id`, `last_name`, `first_name`, `middle_name`, `ext_name`, `place_of_birth`, `date_of_birth`, `age`, `sex`, `civil_status`, `highest_education`, `profile_picture`, `created_by`, `created_at`, `updated_at`, `educational_status`, `philsys_number`, `email`, `mobile_number`, `telephone_number`, `region`, `province`, `city_municipality`, `barangay_address`, `house_address`, `street`, `subdivision`, `zip_code`, `blood_type`, `weight`, `height`, `citizenship`, `registered_voter`, `voter_not_resident`, `ethnicity`, `position_in_household`, `mother_maiden_name`, `has_pet`, `sectors`, `sector_other`, `profession`) VALUES
+(5, 'Morales', 'Miles', 'M', '', 'New City', '2007-12-23', 18, 'Male', 'Single', 'College', '6a75b52f64bc5.jpg', 1, '2026-08-07 10:36:31', '2026-08-07 10:36:31', 'Graduate', '123123123123123', 'nimrodomar@gmail.com', '09158541234', '631231234', 'Autonomous Region in Muslim Mindanao', 'Basilan', 'Quezon City', 'Calut', 'NANANANANANANANANA', 'NA', '', '1132', 'A-', 60.00, '6\'1', 'Filipino', 0, 1, 'Christian', 'Son', 'Tognony', 0, 'Unemployed,Student', '', 'Computer Science');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pets`
+--
+
+CREATE TABLE `pets` (
+  `id` int(11) NOT NULL,
+  `owner_id` int(11) DEFAULT NULL,
+  `pet_name` varchar(100) NOT NULL,
+  `pet_type` varchar(50) NOT NULL,
+  `breed` varchar(100) DEFAULT NULL,
+  `color` varchar(50) DEFAULT NULL,
+  `age` int(11) DEFAULT NULL,
+  `gender` enum('Male','Female') DEFAULT 'Male',
+  `weight` decimal(5,2) DEFAULT NULL,
+  `microchip_number` varchar(50) DEFAULT NULL,
+  `vaccination_status` enum('Up to Date','Partial','None') DEFAULT 'None',
+  `registration_date` date DEFAULT NULL,
+  `status` enum('Active','Inactive','Deceased') DEFAULT 'Active',
+  `pet_photo` varchar(255) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -256,10 +327,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `email`, `role_id`, `last_login`, `is_active`, `created_at`) VALUES
-(1, 'superadmin', 'admin123', 'Super Administrator', 'superadmin@barangay.gov.ph', 1, '2026-07-25 10:52:05', 1, '2026-07-25 09:54:26'),
-(2, 'admin', 'admin123', 'System Administrator', 'admin@barangay.gov.ph', 2, '2026-07-25 10:44:29', 1, '2026-07-25 09:54:26'),
-(3, 'enumerator', 'admin123', 'Field Enumerator', 'enumerator@barangay.gov.ph', 3, NULL, 1, '2026-07-25 09:54:26'),
-(4, 'editor', 'admin123', 'Data Editor', 'editor@barangay.gov.ph', 4, NULL, 1, '2026-07-25 09:54:26');
+(1, 'superadmin', 'admin123', 'Super Administrator', 'superadmin@barangay.gov.ph', 1, '2026-08-07 09:56:49', 1, '2026-07-25 09:54:26'),
+(2, 'admin', 'admin123', 'System Administrator', 'admin@barangay.gov.ph', 2, '2026-07-25 12:03:55', 1, '2026-07-25 09:54:26'),
+(3, 'enumerator', 'admin123', 'Field Enumerator', 'enumerator@barangay.gov.ph', 3, '2026-07-25 12:04:17', 1, '2026-07-25 09:54:26'),
+(4, 'editor', 'admin123', 'Data Editor', 'editor@barangay.gov.ph', 4, '2026-07-25 12:04:03', 1, '2026-07-25 09:54:26');
 
 -- --------------------------------------------------------
 
@@ -401,6 +472,17 @@ ALTER TABLE `individual_records`
   ADD KEY `idx_name_search` (`last_name`,`first_name`,`middle_name`);
 
 --
+-- Indexes for table `pets`
+--
+ALTER TABLE `pets`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `created_by` (`created_by`),
+  ADD KEY `idx_pet_type` (`pet_type`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_owner_id` (`owner_id`),
+  ADD KEY `idx_pet_name` (`pet_name`);
+
+--
 -- Indexes for table `sql_query_log`
 --
 ALTER TABLE `sql_query_log`
@@ -444,7 +526,7 @@ ALTER TABLE `vehicles`
 -- AUTO_INCREMENT for table `audit_trails`
 --
 ALTER TABLE `audit_trails`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `backups`
@@ -474,7 +556,13 @@ ALTER TABLE `household_records`
 -- AUTO_INCREMENT for table `individual_records`
 --
 ALTER TABLE `individual_records`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `pets`
+--
+ALTER TABLE `pets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `sql_query_log`
@@ -486,13 +574,13 @@ ALTER TABLE `sql_query_log`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `user_roles`
 --
 ALTER TABLE `user_roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `vehicles`
@@ -541,6 +629,13 @@ ALTER TABLE `household_records`
 --
 ALTER TABLE `individual_records`
   ADD CONSTRAINT `individual_records_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `pets`
+--
+ALTER TABLE `pets`
+  ADD CONSTRAINT `pets_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `household_records` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `pets_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `sql_query_log`

@@ -14,18 +14,15 @@ $offset = ($page - 1) * $limit;
 
 // Build the query with search
 if (!empty($search)) {
-    // Count with search
     $count_stmt = $pdo->prepare("SELECT COUNT(*) FROM household_records WHERE last_name LIKE ? OR first_name LIKE ? OR middle_name LIKE ?");
     $search_param = "%$search%";
     $count_stmt->execute([$search_param, $search_param, $search_param]);
     $total = $count_stmt->fetchColumn();
     
-    // Get records with search
     $stmt = $pdo->prepare("SELECT * FROM household_records WHERE last_name LIKE ? OR first_name LIKE ? OR middle_name LIKE ? ORDER BY created_at DESC LIMIT $limit OFFSET $offset");
     $stmt->execute([$search_param, $search_param, $search_param]);
     $households = $stmt->fetchAll();
 } else {
-    // No search - get all
     $total = $pdo->query("SELECT COUNT(*) FROM household_records")->fetchColumn();
     $stmt = $pdo->query("SELECT * FROM household_records ORDER BY created_at DESC LIMIT $limit OFFSET $offset");
     $households = $stmt->fetchAll();
@@ -44,8 +41,8 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .profile-preview-sm {
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             object-fit: cover;
             border-radius: 50%;
             border: 2px solid #ddd;
@@ -94,6 +91,15 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
             color: #0d6efd;
             font-weight: 600;
         }
+        .table th {
+            white-space: nowrap;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .table td {
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
@@ -110,7 +116,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                             <span class="search-result">
                                 <i class="fas fa-search"></i> 
                                 Showing results for: <span class="highlight">"<?= htmlspecialchars($search) ?>"</span>
-                                <a href="?<?= isset($_GET['page']) ? 'page='.$_GET['page'] : '' ?>" class="text-danger ms-2" title="Clear search">
+                                <a href="?" class="text-danger ms-2" title="Clear search">
                                     <i class="fas fa-times-circle"></i>
                                 </a>
                             </span>
@@ -150,7 +156,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                                     <div class="stat-number">
                                         <?= $pdo->query("SELECT COUNT(*) FROM household_records WHERE sex = 'Male'")->fetchColumn() ?>
                                     </div>
-                                    <div class="stat-label">Male</div>
+                                    <div class="stat-label">Male Heads</div>
                                 </div>
                                 <div class="stat-icon">
                                     <i class="fas fa-mars"></i>
@@ -165,7 +171,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                                     <div class="stat-number">
                                         <?= $pdo->query("SELECT COUNT(*) FROM household_records WHERE sex = 'Female'")->fetchColumn() ?>
                                     </div>
-                                    <div class="stat-label">Female</div>
+                                    <div class="stat-label">Female Heads</div>
                                 </div>
                                 <div class="stat-icon">
                                     <i class="fas fa-venus"></i>
@@ -175,7 +181,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                     </div>
                 </div>
 
-                <!-- Search Bar with Refresh Button -->
+                <!-- Search Bar -->
                 <div class="search-bar">
                     <form method="GET" class="row g-3">
                         <div class="col-md-8">
@@ -183,7 +189,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                                 <span class="input-group-text"><i class="fas fa-search"></i></span>
                                 <input type="text" name="search" class="form-control" placeholder="Search by last name, first name, or middle name..." value="<?= htmlspecialchars($search) ?>">
                                 <?php if (!empty($search)): ?>
-                                    <a href="?<?= isset($_GET['page']) ? 'page='.$_GET['page'] : '' ?>" class="btn btn-outline-danger" title="Clear search">
+                                    <a href="?" class="btn btn-outline-danger" title="Clear search">
                                         <i class="fas fa-times"></i>
                                     </a>
                                 <?php endif; ?>
@@ -209,17 +215,18 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                             <div class="table-responsive">
                                 <table class="table table-hover table-striped">
                                     <thead class="table-dark">
-                                        <!-- In the table header -->
-<tr>
-    <th style="width: 50px;">Photo</th>
-    <th>Name</th>
-    <th style="width: 60px;">Age</th>
-    <th style="width: 80px;">Sex</th>
-    <th style="width: 100px;">Civil Status</th>
-    <th style="width: 100px;">Household Type</th>  <!-- NEW -->
-    <th style="width: 100px;">Position</th>         <!-- NEW -->
-    <th style="width: 120px;">Actions</th>
-</tr>
+                                        <tr>
+                                            <th style="width: 45px;">Photo</th>
+                                            <th>Name</th>
+                                            <th style="width: 50px;">Age</th>
+                                            <th style="width: 70px;">Sex</th>
+                                            <th style="width: 90px;">Civil Status</th>
+                                            <th style="width: 90px;">Household Type</th>
+                                            <th style="width: 80px;">Position</th>
+                                            <th style="width: 90px;">Citizenship</th>
+                                            <th style="width: 90px;">Occupation</th>
+                                            <th style="width: 140px;">Actions</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         <?php foreach ($households as $household): ?>
@@ -248,8 +255,8 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                                                     </span>
                                                 </td>
                                                 <td><?= $household['civil_status'] ?></td>
-                                                <td><?= htmlspecialchars($household['household_type']) ?: 'N/A' ?></td>
-                                                <td><?= htmlspecialchars($household['position_in_household']) ?: 'N/A' ?></td>
+                                                <td><?= $household['household_type'] ?: 'N/A' ?></td>
+                                                <td><?= $household['position_in_household'] ?: 'N/A' ?></td>
                                                 <td><?= $household['citizenship'] ?: 'N/A' ?></td>
                                                 <td><?= $household['occupation'] ?: 'N/A' ?></td>
                                                 <td>
