@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-card">
             <div class="login-header">
                 <div class="barangay-seal">
-                    <img src="Logo.png" alt="Landmark Icon" width="100" height="100" style="border-radius: 50%;">
+                    <img src="assets/images/Logo.png" alt="Landmark Icon" width="100" height="100" style="border-radius: 50%;">
                 </div>
                 <h2>Registry of Barangay Inhabitants</h2>
                 <p>System Login</p>

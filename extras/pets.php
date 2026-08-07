@@ -66,11 +66,93 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
             border-radius: 12px;
             font-size: 0.7rem;
         }
-        .pet-type-badge.dog { background: #cce5ff; color: #004085; }
-        .pet-type-badge.cat { background: #d4edda; color: #155724; }
-        .pet-type-badge.bird { background: #fff3cd; color: #856404; }
-        .pet-type-badge.fish { background: #d6d8db; color: #1b1e21; }
-        .pet-type-badge.other { background: #e8daef; color: #6c3483; }
+        .pet-type-badge.Dog { background: #cce5ff; color: #004085; }
+        .pet-type-badge.Cat { background: #d4edda; color: #155724; }
+        .pet-type-badge.Bird { background: #fff3cd; color: #856404; }
+        .pet-type-badge.Fish { background: #d6d8db; color: #1b1e21; }
+        .pet-type-badge.Other { background: #e8daef; color: #6c3483; }
+        
+        /* Searchable dropdown styles */
+        .searchable-dropdown {
+            position: relative;
+        }
+        .searchable-dropdown .dropdown-menu {
+            width: 100%;
+            max-height: 250px;
+            overflow-y: auto;
+            border-radius: 10px;
+            border: 2px solid #e8ecf1;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .searchable-dropdown .dropdown-menu .dropdown-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .searchable-dropdown .dropdown-menu .dropdown-item:hover {
+            background: #f0f0f0;
+        }
+        .searchable-dropdown .dropdown-menu .dropdown-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .searchable-dropdown .dropdown-menu .dropdown-item .highlight {
+            font-weight: 700;
+            color: #0d6efd;
+        }
+        .searchable-dropdown .dropdown-toggle {
+            border-radius: 10px !important;
+            border: 2px solid #e8ecf1 !important;
+            padding: 10px 15px !important;
+            background: white !important;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .searchable-dropdown .dropdown-toggle:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+        }
+        .searchable-dropdown .dropdown-toggle .selected-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .searchable-dropdown .search-box {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e8ecf1;
+        }
+        .searchable-dropdown .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e8ecf1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .searchable-dropdown .search-box input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .searchable-dropdown .no-results {
+            padding: 15px;
+            text-align: center;
+            color: #6c757d;
+        }
+        .searchable-dropdown .loading-spinner {
+            padding: 15px;
+            text-align: center;
+        }
+        .searchable-dropdown .dropdown-menu .dropdown-item .badge-id {
+            font-size: 0.65rem;
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: #e9ecef;
+            color: #6c757d;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -200,7 +282,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
     </div>
 
     <!-- Create/Edit Modal -->
-    <div class="modal fade" id="petModal" tabindex="-1">
+    <div class="modal fade" id="petModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -212,14 +294,31 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                 <div class="modal-body">
                     <form id="petForm" enctype="multipart/form-data">
                         <input type="hidden" name="id" id="petId">
+                        <input type="hidden" name="owner_id" id="ownerIdHidden">
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Owner (Household) <span class="text-danger">*</span></label>
-                                <select name="owner_id" id="ownerId" class="form-select" required>
-                                    <option value="">Select Owner...</option>
-                                    <!-- Loaded via AJAX -->
-                                </select>
+                                <div class="searchable-dropdown">
+                                    <button type="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="ownerDropdownToggle">
+                                        <span class="selected-text" id="ownerSelectedText">Select Owner...</span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="dropdown-menu" id="ownerDropdownMenu">
+                                        <div class="search-box">
+                                            <input type="text" id="ownerSearchInput" placeholder="Type to search owners..." autocomplete="off">
+                                        </div>
+                                        <div id="ownerListContainer">
+                                            <div class="loading-spinner">
+                                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                Loading owners...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Type to search for an owner</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Pet Name <span class="text-danger">*</span></label>
@@ -297,7 +396,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="savePet()">
+                    <button type="button" class="btn btn-primary" id="saveBtn" onclick="savePet()">
                         <i class="fas fa-save"></i> Save Pet
                     </button>
                 </div>
@@ -367,14 +466,14 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
         var viewModal;
         var petModal;
         var isEdit = false;
+        var selectedOwnerId = null;
+        var selectedOwnerName = 'Select Owner...';
+        var ownerSearchTimeout = null;
         
         $(document).ready(function() {
             deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
             petModal = new bootstrap.Modal(document.getElementById('petModal'));
-            
-            // Load owners for dropdown
-            loadOwners();
             
             // Initialize DataTable
             table = $('#petsTable').DataTable({
@@ -428,29 +527,102 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                     table.search(search).draw();
                 }
             });
-        });
-        
-        // Load owners from household records
-        function loadOwners() {
-            $.ajax({
-                url: '../api/households.php?draw=1&length=1000',
-                type: 'GET',
-                success: function(response) {
-                    if (response.data) {
-                        var select = $('#ownerId');
-                        select.empty();
-                        select.append('<option value="">Select Owner...</option>');
-                        response.data.forEach(function(item) {
-                            var name = item[1].replace(/<[^>]*>/g, '').trim();
-                            var match = item[7].match(/deleteRecord\((\d+)\)/);
-                            if (match) {
-                                var id = match[1];
-                                select.append('<option value="' + id + '">' + name + '</option>');
-                            }
-                        });
-                    }
+
+            // Owner search with debounce
+            $('#ownerSearchInput').on('keyup', function() {
+                clearTimeout(ownerSearchTimeout);
+                var search = $(this).val();
+                ownerSearchTimeout = setTimeout(function() {
+                    loadOwners(search);
+                }, 300);
+            });
+
+            // Handle dropdown open - load initial owners
+            $('#ownerDropdownToggle').on('click', function() {
+                var container = $('#ownerListContainer');
+                if (container.find('.dropdown-item').length === 0) {
+                    loadOwners('');
                 }
             });
+
+            // Close dropdown when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.searchable-dropdown').length) {
+                    // Don't close if clicking the search input
+                }
+            });
+        });
+        
+        // Load owners via AJAX
+        function loadOwners(search) {
+            var container = $('#ownerListContainer');
+            container.html(`
+                <div class="loading-spinner">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    Searching...
+                </div>
+            `);
+            
+            $.ajax({
+                url: '../api/owners.php',
+                type: 'GET',
+                data: { search: search },
+                success: function(response) {
+                    if (response.data && response.data.length > 0) {
+                        var html = '';
+                        response.data.forEach(function(owner) {
+                            var name = owner.last_name + ', ' + owner.first_name;
+                            if (owner.middle_name) {
+                                name += ' ' + owner.middle_name.charAt(0) + '.';
+                            }
+                            if (owner.ext_name) {
+                                name += ' (' + owner.ext_name + ')';
+                            }
+                            var highlight = search ? owner.last_name : '';
+                            html += `
+                                <div class="dropdown-item" data-id="${owner.id}" onclick="selectOwner(${owner.id}, '${name.replace(/'/g, "\\'")}')">
+                                    ${name}
+                                    <span class="badge-id">#${owner.id}</span>
+                                </div>
+                            `;
+                        });
+                        container.html(html);
+                    } else {
+                        container.html(`
+                            <div class="no-results">
+                                <i class="fas fa-search"></i> No owners found
+                            </div>
+                        `);
+                    }
+                },
+                error: function() {
+                    container.html(`
+                        <div class="no-results text-danger">
+                            <i class="fas fa-exclamation-circle"></i> Failed to load owners
+                        </div>
+                    `);
+                }
+            });
+        }
+        
+        // Select owner
+        function selectOwner(id, name) {
+            selectedOwnerId = id;
+            selectedOwnerName = name;
+            $('#ownerSelectedText').text(name);
+            $('#ownerIdHidden').val(id);
+            
+            // Close dropdown
+            var dropdown = bootstrap.Dropdown.getInstance(document.getElementById('ownerDropdownToggle'));
+            if (dropdown) {
+                dropdown.hide();
+            }
+            
+            // Update active state
+            $('#ownerListContainer .dropdown-item').removeClass('active');
+            $('#ownerListContainer .dropdown-item[data-id="' + id + '"]').addClass('active');
         }
         
         // Update statistics
@@ -483,6 +655,14 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
             $('#petStatus').val('Active');
             $('#petGender').val('Male');
             $('#vaccinationStatus').val('Up to Date');
+            
+            // Reset owner selection
+            selectedOwnerId = null;
+            selectedOwnerName = 'Select Owner...';
+            $('#ownerSelectedText').text('Select Owner...');
+            $('#ownerIdHidden').val('');
+            $('#ownerListContainer .dropdown-item').removeClass('active');
+            
             petModal.show();
         }
         
@@ -496,7 +676,6 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                 type: 'GET',
                 success: function(data) {
                     $('#petId').val(data.id);
-                    $('#ownerId').val(data.owner_id);
                     $('#petName').val(data.pet_name);
                     $('#petType').val(data.pet_type);
                     $('#petBreed').val(data.breed);
@@ -508,6 +687,14 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                     $('#vaccinationStatus').val(data.vaccination_status);
                     $('#registrationDate').val(data.registration_date);
                     $('#petStatus').val(data.status);
+                    
+                    // Set owner
+                    if (data.owner_id) {
+                        selectedOwnerId = data.owner_id;
+                        selectedOwnerName = data.owner_name || 'Owner #' + data.owner_id;
+                        $('#ownerSelectedText').text(selectedOwnerName);
+                        $('#ownerIdHidden').val(data.owner_id);
+                    }
                     
                     if (data.pet_photo) {
                         $('#photoPreview').html('<img src="../uploads/' + data.pet_photo + '" class="pet-photo-sm" alt="Pet">');
@@ -522,8 +709,19 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
         
         // Save pet
         function savePet() {
+            // Validate owner is selected
+            if (!selectedOwnerId || selectedOwnerId === '') {
+                showAlert('danger', 'Please select an owner.');
+                return;
+            }
+            
+            // Set owner_id in form
+            $('#ownerIdHidden').val(selectedOwnerId);
+            
             var formData = new FormData($('#petForm')[0]);
             var url = isEdit ? '../api/pet_update.php' : '../api/pet_create.php';
+            
+            $('#saveBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
             
             $.ajax({
                 url: url,
@@ -532,6 +730,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                 processData: false,
                 contentType: false,
                 success: function(response) {
+                    $('#saveBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Save Pet');
                     if (response.success) {
                         petModal.hide();
                         table.ajax.reload();
@@ -541,6 +740,7 @@ $user_role = $_SESSION['role'] ?? 'enumerator';
                     }
                 },
                 error: function() {
+                    $('#saveBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Save Pet');
                     showAlert('danger', 'An error occurred. Please try again.');
                 }
             });

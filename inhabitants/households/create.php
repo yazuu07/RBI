@@ -9,16 +9,24 @@ $success = false;
 $record_id = null;
 
 // Get existing household members for head of family dropdown
-$members = $pdo->query("SELECT id, last_name, first_name, middle_name FROM household_records ORDER BY last_name, first_name")->fetchAll();
+$members = $pdo->query("
+    SELECT id, last_name, first_name, middle_name, ext_name 
+    FROM household_records 
+    ORDER BY last_name, first_name
+")->fetchAll();
 
-// Get household types from database or use defaults
+// Get all citizens for possible head of family (searchable)
+$citizens = $pdo->query("
+    SELECT id, last_name, first_name, middle_name, ext_name 
+    FROM individual_records 
+    ORDER BY last_name, first_name
+")->fetchAll();
+
+// Define option arrays
 $household_types = ['Nuclear', 'Single Parent', 'Extended', 'Childless', 'Grandparent', 'Step Family'];
-
-// Get dwelling types
 $dwelling_types = ['Single Family House', 'Townhouse', 'Condominium', 'Duplex', 'Mobile Home', 'Multi Unit', 'Apartment'];
-
-// Get positions
 $positions = ['Father', 'Mother', 'Son', 'Daughter', 'Grandmother', 'Grandfather', 'Father in Law', 'Mother in Law', 'Brother in Law', 'Sister in Law'];
+$tenure_statuses = ['Owner', 'Renter', 'Living with Parents', 'Living with Relatives', 'Boarder', 'Other'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
@@ -98,9 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "Added household: $first_name $last_name");
             $success = true;
             clearCache('dashboard_stats');
-            
-            // Refresh members list
-            $members = $pdo->query("SELECT id, last_name, first_name, middle_name FROM household_records ORDER BY last_name, first_name")->fetchAll();
         } else {
             $errors[] = "Failed to save record. Please try again.";
         }
@@ -115,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Create Household - RBIS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="../../assets/css/custom.css">
     <style>
         .form-section {
@@ -143,17 +149,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #6c757d;
             font-style: italic;
         }
-        .badge-option {
-            padding: 5px 12px;
-            border-radius: 20px;
-            background: #e9ecef;
-            margin: 2px;
-            font-size: 0.8rem;
-            display: inline-block;
+        /* Bootstrap Select customization */
+        .bootstrap-select .dropdown-toggle {
+            border-radius: 10px !important;
+            border: 2px solid #e8ecf1 !important;
+            padding: 10px 15px !important;
+            background: white !important;
         }
-        .badge-option.active {
-            background: #28a745;
-            color: white;
+        .bootstrap-select .dropdown-toggle:focus {
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+        }
+        .dropdown-menu {
+            border-radius: 10px !important;
+            border: 2px solid #e8ecf1 !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+        }
+        .dropdown-menu .dropdown-item {
+            padding: 8px 15px !important;
+            font-size: 0.9rem !important;
+        }
+        .dropdown-menu .dropdown-item:hover {
+            background: #f0f0f0 !important;
+        }
+        .dropdown-menu .dropdown-item.active {
+            background: #28a745 !important;
+            color: white !important;
+        }
+        .bs-searchbox .form-control {
+            border-radius: 8px !important;
+            border: 2px solid #e8ecf1 !important;
+            padding: 8px 12px !important;
+        }
+        .bs-searchbox .form-control:focus {
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
         }
     </style>
 </head>
@@ -192,6 +222,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
 
                 <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <!-- Profile Picture -->
+                    <div class="text-center mb-4">
+                        <div class="mb-2">
+                            <img id="profilePreview" src="../../assets/images/default-avatar.png" class="profile-preview" alt="Profile Preview">
+                        </div>
+                        <label class="btn btn-outline-primary">
+                            <i class="fas fa-camera"></i> Upload Profile Picture
+                            <input type="file" name="profile_picture" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                        </label>
+                        <small class="d-block text-muted mt-1">JPG, PNG, GIF (Max 2MB)</small>
+                    </div>
+
                     <!-- ============================================ -->
                     <!-- HOUSEHOLD TYPE SECTION -->
                     <!-- ============================================ -->
@@ -200,9 +242,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="fas fa-home"></i> HOUSEHOLD TYPE
                         </div>
                         <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    Select Household Type <span class="required-star">*</span>
+                                    Household Type <span class="required-star">*</span>
                                 </label>
                                 <select name="household_type" class="form-select" required>
                                     <option value="">Select household type...</option>
@@ -210,25 +252,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <option value="<?= $type ?>"><?= $type ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <div class="help-text mt-1">
-                                    <i class="fas fa-info-circle"></i> 
-                                    Select the type of household you belong to from the options provided.
-                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- ============================================ -->
-                    <!-- DWELLING TYPE SECTION -->
-                    <!-- ============================================ -->
-                    <div class="form-section">
-                        <div class="form-section-title">
-                            <i class="fas fa-building"></i> DWELLING TYPE
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    Select Dwelling Type
+                                    Dwelling Type
                                 </label>
                                 <select name="dwelling_type" class="form-select">
                                     <option value="">Select dwelling type...</option>
@@ -236,10 +263,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <option value="<?= $type ?>"><?= $type ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <div class="help-text mt-1">
-                                    <i class="fas fa-info-circle"></i> 
-                                    Select the type of dwelling your household resides in.
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -262,20 +285,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <option value="<?= $pos ?>"><?= $pos ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <div class="help-text mt-1">
-                                    <i class="fas fa-info-circle"></i> 
-                                    Select your position in the household.
-                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
                                     Household Name
                                 </label>
                                 <input type="text" name="household_name" class="form-control" placeholder="e.g., Dela Cruz Family">
-                                <div class="help-text mt-1">
-                                    <i class="fas fa-info-circle"></i> 
-                                    Enter the name of your household (e.g., "Dela Cruz Family").
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -294,17 +309,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </label>
                                 <select name="tenure_status" class="form-select">
                                     <option value="">Select tenure status...</option>
-                                    <option value="Owner">Owner</option>
-                                    <option value="Renter">Renter</option>
-                                    <option value="Living with Parents">Living with Parents</option>
-                                    <option value="Living with Relatives">Living with Relatives</option>
-                                    <option value="Boarder">Boarder</option>
-                                    <option value="Other">Other</option>
+                                    <?php foreach ($tenure_statuses as $status): ?>
+                                        <option value="<?= $status ?>"><?= $status ?></option>
+                                    <?php endforeach; ?>
                                 </select>
-                                <div class="help-text mt-1">
-                                    <i class="fas fa-info-circle"></i> 
-                                    Indicate your tenure status.
-                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
@@ -314,16 +322,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <span class="input-group-text">₱</span>
                                     <input type="number" name="monthly_income" class="form-control" placeholder="0.00" step="0.01" min="0">
                                 </div>
-                                <div class="help-text mt-1">
-                                    <i class="fas fa-info-circle"></i> 
-                                    Specify the total monthly income of your household.
-                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- ============================================ -->
-                    <!-- HEAD OF FAMILY SECTION -->
+                    <!-- HEAD OF FAMILY SECTION - SEARCHABLE DROPDOWN -->
                     <!-- ============================================ -->
                     <div class="form-section">
                         <div class="form-section-title">
@@ -334,20 +338,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label class="form-label">
                                     Select Head of the Family
                                 </label>
-                                <select name="head_of_family_id" class="form-select">
+                                <select name="head_of_family_id" id="headOfFamily" class="form-select selectpicker" data-live-search="true" title="Search for member...">
                                     <option value="">Select member...</option>
-                                    <?php foreach ($members as $member): ?>
-                                        <option value="<?= $member['id'] ?>">
-                                            <?= $member['last_name'] ?>, <?= $member['first_name'] ?>
-                                            <?php if ($member['middle_name']): ?>
-                                                <?= $member['middle_name'][0] ?>.
-                                            <?php endif; ?>
-                                        </option>
-                                    <?php endforeach; ?>
+                                    
+                                    <!-- Household Members -->
+                                    <?php if (count($members) > 0): ?>
+                                        <optgroup label="Household Members">
+                                            <?php foreach ($members as $member): ?>
+                                                <option value="<?= $member['id'] ?>">
+                                                    <?= htmlspecialchars($member['last_name']) ?>, <?= htmlspecialchars($member['first_name']) ?>
+                                                    <?php if ($member['middle_name']): ?>
+                                                        <?= htmlspecialchars($member['middle_name'][0]) ?>.
+                                                    <?php endif; ?>
+                                                    <?php if ($member['ext_name']): ?>
+                                                        (<?= htmlspecialchars($member['ext_name']) ?>)
+                                                    <?php endif; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </optgroup>
+                                    <?php endif; ?>
+                                    
+                                    <!-- Citizens -->
+                                    <?php if (count($citizens) > 0): ?>
+                                        <optgroup label="Barangay Citizens">
+                                            <?php foreach ($citizens as $citizen): ?>
+                                                <option value="<?= $citizen['id'] ?>">
+                                                    <?= htmlspecialchars($citizen['last_name']) ?>, <?= htmlspecialchars($citizen['first_name']) ?>
+                                                    <?php if ($citizen['middle_name']): ?>
+                                                        <?= htmlspecialchars($citizen['middle_name'][0]) ?>.
+                                                    <?php endif; ?>
+                                                    <?php if ($citizen['ext_name']): ?>
+                                                        (<?= htmlspecialchars($citizen['ext_name']) ?>)
+                                                    <?php endif; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </optgroup>
+                                    <?php endif; ?>
                                 </select>
                                 <div class="help-text mt-1">
                                     <i class="fas fa-info-circle"></i> 
-                                    Identify the head of the family by selecting from existing members.
+                                    Type to search for the head of the family. You can select from household members or barangay citizens.
                                 </div>
                             </div>
                         </div>
@@ -360,17 +390,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="form-section-title">
                             <i class="fas fa-user"></i> PERSONAL INFORMATION
                         </div>
-                        <!-- Profile Picture -->
-                        <div class="text-center mb-3">
-                            <div class="mb-2">
-                                <img id="profilePreview" src="../../assets/images/default-avatar.png" class="profile-preview" alt="Profile Preview">
-                            </div>
-                            <label class="btn btn-outline-primary">
-                                <i class="fas fa-camera"></i> Upload Profile Picture
-                                <input type="file" name="profile_picture" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                            </label>
-                        </div>
-
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Last Name <span class="required-star">*</span></label>
@@ -467,7 +486,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
     <script>
+        $(document).ready(function() {
+            // Initialize Bootstrap Select
+            $('.selectpicker').selectpicker({
+                liveSearch: true,
+                liveSearchPlaceholder: 'Type to search for member...',
+                size: 10,
+                dropupAuto: false
+            });
+        });
+
         function previewImage(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();

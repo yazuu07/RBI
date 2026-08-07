@@ -333,34 +333,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- ============================================ -->
                     <!-- HEAD OF FAMILY SECTION -->
                     <!-- ============================================ -->
-                    <div class="form-section">
-                        <div class="form-section-title">
-                            <i class="fas fa-user-tie"></i> HEAD OF THE FAMILY
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">
-                                    Select Head of the Family
-                                </label>
-                                <select name="head_of_family_id" class="form-select">
-                                    <option value="">Select member...</option>
-                                    <?php foreach ($members as $member): ?>
-                                        <option value="<?= $member['id'] ?>" <?= $record['head_of_family_id'] == $member['id'] ? 'selected' : '' ?>>
-                                            <?= $member['last_name'] ?>, <?= $member['first_name'] ?>
-                                            <?php if ($member['middle_name']): ?>
-                                                <?= $member['middle_name'][0] ?>.
-                                            <?php endif; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <div class="help-text mt-1">
-                                    <i class="fas fa-info-circle"></i> 
-                                    Identify the head of the family by selecting from existing members.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                   <!-- ============================================ -->
+<!-- HEAD OF FAMILY SECTION - SEARCHABLE DROPDOWN -->
+<!-- ============================================ -->
+<div class="form-section">
+    <div class="form-section-title">
+        <i class="fas fa-user-tie"></i> HEAD OF THE FAMILY
+    </div>
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <label class="form-label">
+                Select Head of the Family
+            </label>
+            <select name="head_of_family_id" id="headOfFamily" class="form-select selectpicker" data-live-search="true" title="Search for member...">
+                <option value="">Select member...</option>
+                
+                <!-- Household Members -->
+                <?php if (count($members) > 0): ?>
+                    <optgroup label="Household Members">
+                        <?php foreach ($members as $member): ?>
+                            <option value="<?= $member['id'] ?>" <?= $record['head_of_family_id'] == $member['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($member['last_name']) ?>, <?= htmlspecialchars($member['first_name']) ?>
+                                <?php if ($member['middle_name']): ?>
+                                    <?= htmlspecialchars($member['middle_name'][0]) ?>.
+                                <?php endif; ?>
+                                <?php if ($member['ext_name']): ?>
+                                    (<?= htmlspecialchars($member['ext_name']) ?>)
+                                <?php endif; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                <?php endif; ?>
+                
+                <!-- Citizens -->
+                <?php if (count($citizens) > 0): ?>
+                    <optgroup label="Barangay Citizens">
+                        <?php foreach ($citizens as $citizen): ?>
+                            <option value="<?= $citizen['id'] ?>" <?= $record['head_of_family_id'] == $citizen['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($citizen['last_name']) ?>, <?= htmlspecialchars($citizen['first_name']) ?>
+                                <?php if ($citizen['middle_name']): ?>
+                                    <?= htmlspecialchars($citizen['middle_name'][0]) ?>.
+                                <?php endif; ?>
+                                <?php if ($citizen['ext_name']): ?>
+                                    (<?= htmlspecialchars($citizen['ext_name']) ?>)
+                                <?php endif; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                <?php endif; ?>
+            </select>
+            <div class="help-text mt-1">
+                <i class="fas fa-info-circle"></i> 
+                Type to search for the head of the family. You can select from household members or barangay citizens.
+            </div>
+        </div>
+    </div>
+</div>
                     <!-- ============================================ -->
                     <!-- PERSONAL INFORMATION SECTION -->
                     <!-- ============================================ -->

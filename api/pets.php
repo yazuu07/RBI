@@ -1,4 +1,5 @@
 <?php
+// api/pets.php - Updated to handle duplicates properly
 require_once '../config.php';
 requireLogin();
 
@@ -15,16 +16,19 @@ $search = isset($_GET['search']['value']) ? trim($_GET['search']['value']) : '';
 $order_column = isset($_GET['order'][0]['column']) ? intval($_GET['order'][0]['column']) : 0;
 $order_dir = isset($_GET['order'][0]['dir']) ? $_GET['order'][0]['dir'] : 'DESC';
 
-$columns = ['p.id', 'p.pet_name', 'p.pet_type', 'p.breed', 'p.age', 'p.status'];
+$columns = ['p.id', 'p.pet_name', 'p.pet_type', 'p.breed', 'p.age', 'p.status', 'owner_name'];
 $order_by = $columns[$order_column] ?? 'p.created_at';
 $order_dir = strtoupper($order_dir) === 'ASC' ? 'ASC' : 'DESC';
 
-$sql = "SELECT p.*, 
-        CONCAT(h.last_name, ', ', h.first_name) as owner_name
+// Build query with DISTINCT to prevent duplicates
+$sql = "SELECT DISTINCT p.*, 
+        CONCAT(h.last_name, ', ', h.first_name, 
+               IF(h.middle_name IS NOT NULL, CONCAT(' ', SUBSTRING(h.middle_name, 1, 1), '.'), ''),
+               IF(h.ext_name IS NOT NULL, CONCAT(' (', h.ext_name, ')'), '')) as owner_name
         FROM pets p 
         LEFT JOIN household_records h ON p.owner_id = h.id 
         WHERE 1=1";
-$count_sql = "SELECT COUNT(*) FROM pets p WHERE 1=1";
+$count_sql = "SELECT COUNT(DISTINCT p.id) FROM pets p WHERE 1=1";
 $params = [];
 
 if (!empty($search)) {
@@ -49,11 +53,13 @@ if (isset($_GET['status']) && !empty($_GET['status'])) {
     $params[] = $_GET['status'];
 }
 
+// Get total count
 $stmt = $pdo->prepare($count_sql);
 $stmt->execute($params);
 $total_records = $stmt->fetchColumn();
 $filtered_count = $total_records;
 
+// Apply ordering and pagination
 $sql .= " ORDER BY $order_by $order_dir LIMIT $length OFFSET $start";
 
 $stmt = $pdo->prepare($sql);
