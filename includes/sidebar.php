@@ -80,7 +80,7 @@ $base_path = '/dashboard/RBI';  // Adjust this to your actual path
     transform: rotate(-90deg);
 }
 .sidebar-user-info {
-    position: absolute;
+    position: relative;
     bottom: 0;
     left: 0;
     right: 0;
@@ -143,7 +143,7 @@ $base_path = '/dashboard/RBI';  // Adjust this to your actual path
         <!-- Brand -->
         <div class="sidebar-brand">
             <div class="brand-icon">
-                 <img src="Logo.png" alt="Landmark Icon">
+                 <img src="http://localhost/dashboard/RBI/assets/images/Logo.png" alt="Landmark Icon">
             </div>
             <div class="brand-text">RBIS</div>
             <div class="brand-sub">Barangay Registry</div>
