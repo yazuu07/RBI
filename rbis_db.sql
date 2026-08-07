@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 07, 2026 at 12:49 PM
+-- Generation Time: Aug 07, 2026 at 02:45 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -93,7 +93,23 @@ INSERT INTO `audit_trails` (`id`, `user_id`, `action`, `table_name`, `record_id`
 (37, 1, 'VIEW', 'household_records', 3, 'Viewed household: Nimrod Palomar', '::1', '2026-08-07 10:39:53'),
 (38, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:40:06'),
 (39, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:41:47'),
-(40, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:42:09');
+(40, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 10:42:09'),
+(41, 1, 'LOGIN', 'users', 1, 'User logged in', '::1', '2026-08-07 11:57:57'),
+(42, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 11:58:03'),
+(43, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 12:01:32'),
+(44, 1, 'VIEW', 'individual_records', 5, 'Viewed citizen: Miles Morales', '::1', '2026-08-07 12:09:27'),
+(45, 1, 'UPDATE', 'individual_records', 5, 'Updated citizen: Miles Morales', '::1', '2026-08-07 12:09:39'),
+(46, 1, 'CREATE', 'individual_records', 6, 'Added citizen: Rio Valiente', '::1', '2026-08-07 12:17:23'),
+(47, 1, 'VIEW', 'individual_records', 6, 'Viewed citizen: Rio Valiente', '::1', '2026-08-07 12:17:26'),
+(48, 1, 'CREATE', 'household_records', 4, 'Added household: Rio Valiente', '::1', '2026-08-07 12:22:06'),
+(49, 1, 'VIEW', 'household_records', 4, 'Viewed household: Rio Valiente', '::1', '2026-08-07 12:22:07'),
+(50, 1, 'VIEW', 'household_records', 4, 'Viewed household: Rio Valiente', '::1', '2026-08-07 12:22:16'),
+(51, 1, 'VIEW', 'household_records', 3, 'Viewed household: Nimrod Palomar', '::1', '2026-08-07 12:22:32'),
+(52, 1, 'CREATE', 'pets', 1, 'Added pet: Bailey (Dog)', '::1', '2026-08-07 12:37:03'),
+(53, 1, 'UPDATE', 'individual_records', 6, 'Updated citizen: Rio Valiente', '::1', '2026-08-07 12:37:38'),
+(54, 1, 'VIEW', 'individual_records', 6, 'Viewed citizen: Rio Valiente', '::1', '2026-08-07 12:37:40'),
+(55, 1, 'LOGOUT', 'users', 1, 'User logged out', '::1', '2026-08-07 12:39:49'),
+(56, 1, 'LOGIN', 'users', 1, 'User logged in', '::1', '2026-08-07 12:40:28');
 
 -- --------------------------------------------------------
 
@@ -204,7 +220,8 @@ CREATE TABLE `household_records` (
 --
 
 INSERT INTO `household_records` (`id`, `last_name`, `first_name`, `middle_name`, `ext_name`, `place_of_birth`, `date_of_birth`, `age`, `sex`, `civil_status`, `citizenship`, `occupation`, `profession`, `disability`, `pets`, `profile_picture`, `created_by`, `created_at`, `updated_at`, `household_type`, `dwelling_type`, `household_name`, `position_in_household`, `tenure_status`, `monthly_income`, `head_of_family_id`) VALUES
-(3, 'Palomar', 'Nimrod', '', 'Jr.', 'Caloocan', '1980-10-23', 45, 'Male', 'Single', 'Filipino', 'Student', 'NA', 'NA', 'Cat', NULL, 1, '2026-07-25 11:34:16', '2026-07-25 11:34:16', 'Nuclear', 'Single Family House', 'Palomar', 'Father', 'Owner', 100000.00, NULL);
+(3, 'Palomar', 'Nimrod', '', 'Jr.', 'Caloocan', '1980-10-23', 45, 'Male', 'Single', 'Filipino', 'Student', 'NA', 'NA', 'Cat', NULL, 1, '2026-07-25 11:34:16', '2026-07-25 11:34:16', 'Nuclear', 'Single Family House', 'Palomar', 'Father', 'Owner', 100000.00, NULL),
+(4, 'Valiente', 'Rio', '', 'Jr', 'San Fransico', '2002-12-12', 23, 'Male', 'Single', 'Filipino', 'Student', 'NA', 'NA', 'Cat', NULL, 1, '2026-08-07 12:22:06', '2026-08-07 12:22:06', 'Nuclear', 'Single Family House', 'Valiente', 'Father', 'Owner', 200000.00, 6);
 
 -- --------------------------------------------------------
 
@@ -261,7 +278,8 @@ CREATE TABLE `individual_records` (
 --
 
 INSERT INTO `individual_records` (`id`, `last_name`, `first_name`, `middle_name`, `ext_name`, `place_of_birth`, `date_of_birth`, `age`, `sex`, `civil_status`, `highest_education`, `profile_picture`, `created_by`, `created_at`, `updated_at`, `educational_status`, `philsys_number`, `email`, `mobile_number`, `telephone_number`, `region`, `province`, `city_municipality`, `barangay_address`, `house_address`, `street`, `subdivision`, `zip_code`, `blood_type`, `weight`, `height`, `citizenship`, `registered_voter`, `voter_not_resident`, `ethnicity`, `position_in_household`, `mother_maiden_name`, `has_pet`, `sectors`, `sector_other`, `profession`) VALUES
-(5, 'Morales', 'Miles', 'M', '', 'New City', '2007-12-23', 18, 'Male', 'Single', 'College', '6a75b52f64bc5.jpg', 1, '2026-08-07 10:36:31', '2026-08-07 10:36:31', 'Graduate', '123123123123123', 'nimrodomar@gmail.com', '09158541234', '631231234', 'Autonomous Region in Muslim Mindanao', 'Basilan', 'Quezon City', 'Calut', 'NANANANANANANANANA', 'NA', '', '1132', 'A-', 60.00, '6\'1', 'Filipino', 0, 1, 'Christian', 'Son', 'Tognony', 0, 'Unemployed,Student', '', 'Computer Science');
+(5, 'Morales', 'Miles', 'M', '', 'New City', '2007-08-07', 19, 'Male', 'Single', 'College', '6a75b52f64bc5.jpg', 1, '2026-08-07 10:36:31', '2026-08-07 12:09:39', 'Graduate', '123123123123123', 'nimrodomar@gmail.com', '09158541234', '631231234', 'Autonomous Region in Muslim Mindanao', 'Basilan', 'Quezon City', 'Calut', 'NANANANANANANANANA', 'NA', '', '1132', 'A-', 60.00, '6\'1', 'Filipino', 0, 1, 'Christian', 'Son', 'Tognony', 0, 'Unemployed,Student', '', 'Computer Science'),
+(6, 'Valiente', 'Rio', '', 'Jr.', 'New City', '2006-12-12', 19, 'Male', 'Single', 'Vocational', '6a75ccd3d978e.jpg', 1, '2026-08-07 12:17:23', '2026-08-07 12:37:38', 'Graduate', '12312312312312', 'rio@gmail.com', '09158541583', '09158541583', 'Mimaropa', 'Rizal', 'Quezon City', 'Santo Cristo', 'NANANANANANANANANA', 'NA', 'NA', '1122', 'A+', 40.00, '6\'1', 'Filipino', 1, 0, 'Christian', 'Father', 'NA', 0, 'Employed', '', 'IT');
 
 -- --------------------------------------------------------
 
@@ -287,6 +305,13 @@ CREATE TABLE `pets` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `pets`
+--
+
+INSERT INTO `pets` (`id`, `owner_id`, `pet_name`, `pet_type`, `breed`, `color`, `age`, `gender`, `weight`, `microchip_number`, `vaccination_status`, `registration_date`, `status`, `pet_photo`, `created_by`, `created_at`) VALUES
+(1, 3, 'Bailey', 'Dog', 'Labrador', 'Light brown', 3, 'Male', 60.00, '12341234', 'Up to Date', '2023-12-12', 'Active', '6a75d16f18e06.jpg', 1, '2026-08-07 12:37:03');
 
 -- --------------------------------------------------------
 
@@ -327,7 +352,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `email`, `role_id`, `last_login`, `is_active`, `created_at`) VALUES
-(1, 'superadmin', 'admin123', 'Super Administrator', 'superadmin@barangay.gov.ph', 1, '2026-08-07 09:56:49', 1, '2026-07-25 09:54:26'),
+(1, 'superadmin', 'admin123', 'Super Administrator', 'superadmin@barangay.gov.ph', 1, '2026-08-07 12:40:28', 1, '2026-07-25 09:54:26'),
 (2, 'admin', 'admin123', 'System Administrator', 'admin@barangay.gov.ph', 2, '2026-07-25 12:03:55', 1, '2026-07-25 09:54:26'),
 (3, 'enumerator', 'admin123', 'Field Enumerator', 'enumerator@barangay.gov.ph', 3, '2026-07-25 12:04:17', 1, '2026-07-25 09:54:26'),
 (4, 'editor', 'admin123', 'Data Editor', 'editor@barangay.gov.ph', 4, '2026-07-25 12:04:03', 1, '2026-07-25 09:54:26');
@@ -526,7 +551,7 @@ ALTER TABLE `vehicles`
 -- AUTO_INCREMENT for table `audit_trails`
 --
 ALTER TABLE `audit_trails`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `backups`
@@ -550,19 +575,19 @@ ALTER TABLE `certificates`
 -- AUTO_INCREMENT for table `household_records`
 --
 ALTER TABLE `household_records`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `individual_records`
 --
 ALTER TABLE `individual_records`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `pets`
 --
 ALTER TABLE `pets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `sql_query_log`
